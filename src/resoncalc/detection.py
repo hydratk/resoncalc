@@ -16,6 +16,10 @@ from os import path
 from scipy.signal import find_peaks
 
 # globals
+nquad = 15            # order of quadrature
+emax = 1.0            # maximum energy in atomic units
+mu = 1.0              # reduced mass in atomic units
+l = 1                 # secondar quantum number
 x0 = 0.0              # ecs point x0
 phases = [40.0, 30.0] # ecs phases
 prec = 1e-8           # ecs precision
@@ -30,7 +34,7 @@ def perform_detection_loop(cfg):
     {
      'title': 'test',
      'potential': 'gaussian',
-     'n' : 15,
+     'nquad' : 15,
      'x0' : 0.0,
      'phases' : [40.0, 30.0],
      'prec' : 1e-8,
@@ -60,6 +64,10 @@ def perform_detection_loop(cfg):
 
     # optional parameters
     title = cfg['title'] if ('title' in cfg) else cfg['potential']
+    globals()['nquad'] = cfg['nquad'] if ('nquad' in cfg) else globals()['nquad']
+    globals()['emax'] = cfg['emax'] if ('emax' in cfg) else globals()['emax']
+    globals()['mu'] = cfg['mu'] if ('mu' in cfg) else globals()['mu']
+    globals()['l'] = cfg['l'] if ('l' in cfg) else globals()['l']
     globals()['x0'] = cfg['x0'] if ('x0' in cfg) else globals()['x0']
     globals()['phases'] = cfg['phases'] if ('phases' in cfg) else globals()['phases'] 
     globals()['prec'] = cfg['prec'] if ('prec' in cfg) else globals()['prec']
@@ -79,7 +87,10 @@ def perform_detection_loop(cfg):
     eigenstates = []
     params = []
 
-    try:
+    try:        
+
+        # create common grid
+        grid = create_grid(nquad, cfg['intervals'])
         
         # param1 loop
         for param1 in rng1:
@@ -90,8 +101,8 @@ def perform_detection_loop(cfg):
 
                 # detection
                 try:
-                    states = perform_detection(potential.mapping[cfg['potential']], cfg['n'], cfg['emax'], cfg['mu'], cfg['intervals'],
-                                               param1, param2, cfg['l'], cfg['mu'], *params2)
+                    states = perform_detection(potential.mapping[cfg['potential']], nquad, emax, mu, cfg['intervals'], grid,
+                                               param1, param2, l, mu, *params2)
 
                 # exceptions handled outside
                 except KeyboardInterrupt as ex:
@@ -108,7 +119,7 @@ def perform_detection_loop(cfg):
                 if (states is not None):
                     for state in states:
                         eigenstates.append(state)
-                        params.append((param1, param2, cfg['l']))
+                        params.append((param1, param2, l))
                 
                 test += 1
 
@@ -125,7 +136,7 @@ def perform_detection_loop(cfg):
     except FileNotFoundError as ex:
         print('Output directory {0} not found'.format(output.outdir))
 
-def perform_detection(potential, n, emax, mu, intervals, *params):
+def perform_detection(potential, n, emax, mu, intervals, grid, *params):
     """Perform eigenstate detection for one potential configuration
 
     Args:
@@ -143,33 +154,28 @@ def perform_detection(potential, n, emax, mu, intervals, *params):
 
     # spectrum for first ECS phase
     phase = phases[0]
-    endpoints = create_endpoints(intervals)
     output.debug('Using ECS x0: {0}, phase: {1}'.format(x0, phase))
-    endpoints = femdvr.exterior_complex_scaling(endpoints, x0, phase)
-    points, weights = femdvr.fem_points_weights(n, endpoints)
     output.debug('Creating Hamiltonian matrix')
-    matrix, potential_grid = femdvr.hamiltonian(n, endpoints, potential, points, mu, *params)
-    output.export_potential_grid(points, potential_grid, phase, *params)
+    matrix, potential_grid = femdvr.hamiltonian(n, grid['endpoints1'], potential, grid['points1'], grid['stiffness1'], mu, *params)
+    output.export_potential_grid(grid['points1'], potential_grid, phase, *params)
     output.debug('Calculating eigenvalues')
     eigenvalues1 = femdvr.spectrum(matrix)
     output.export_eigenvalues(eigenvalues1, phase, *params)
 
     # spectrum for second ECS phase
     phase = phases[1]
-    endpoints = create_endpoints(intervals)
     output.debug('Using ECS x0: {0}, phase: {1}'.format(x0, phase))
-    endpoints = femdvr.exterior_complex_scaling(endpoints, x0, phase)
-    points, weights = femdvr.fem_points_weights(n, endpoints)
     output.debug('Creating Hamiltonian matrix')
-    matrix, potential_grid = femdvr.hamiltonian(n, endpoints, potential, points, mu, *params)
-    output.export_potential_grid(points, potential_grid, phase, *params)
+    matrix, potential_grid = femdvr.hamiltonian(n, grid['endpoints2'], potential, grid['points2'], grid['stiffness2'], mu, *params)
+    output.export_potential_grid(grid['points2'], potential_grid, phase, *params)
     output.debug('Calculating eigenvalues')
     eigenvalues2 = femdvr.spectrum(matrix)
     output.export_eigenvalues(eigenvalues2, phase, *params)
 
     # detect eigenstate
     output.debug('Detecting eigenstate')
-    potmax = potential_maximum(potential, np.real(endpoints[1]), np.real(endpoints[1])+20.0, *params)
+    init_point = grid['endpoints1'][1]
+    potmax = potential_maximum(potential, np.real(init_point), np.real(init_point)+20.0, *params)
     states = detect_states(emax, potmax, eigenvalues1, eigenvalues2)
     
     if (states is not None):
@@ -180,11 +186,47 @@ def perform_detection(potential, n, emax, mu, intervals, *params):
         output.export_complex_spectrum_fig(eigenvalues1, eigenvalues2, states, *params)
 
         # plot eigenstates 
-        output.export_eigenstates_fig(potential, states, np.real(endpoints[1]), np.real(endpoints[1])+20.0, emax, *params)
+        output.export_eigenstates_fig(potential, states, np.real(init_point), np.real(init_point)+20.0, emax, *params)
     else:
         output.info('Eigenstate not detected')
 
     return states
+
+def create_grid(n, intervals):
+    """Create common grid and stiffness matrix for both ECS phases
+
+    Args:
+        n (int): order of quadrature
+        intervals (dict): interval configuration
+
+    Returns:
+        dict: endpoints1, points1, stiffness1
+              endpoints2, points2, stiffness2
+
+    """     
+
+    output.debug('Creating grid')
+    grid = {}
+
+    # first ECS phase
+    endpoints = create_endpoints(intervals)
+    endpoints = femdvr.exterior_complex_scaling(endpoints, x0, phases[0])
+    points, weights = femdvr.fem_points_weights(n, endpoints)
+    stiffness = femdvr.stiffness_matrix(n, endpoints)
+    grid['endpoints1'] = endpoints
+    grid['points1'] = points
+    grid['stiffness1'] = stiffness
+
+    # second ECS phase
+    endpoints = create_endpoints(intervals)
+    endpoints = femdvr.exterior_complex_scaling(endpoints, x0, phases[1])
+    points, weights = femdvr.fem_points_weights(n, endpoints)
+    stiffness = femdvr.stiffness_matrix(n, endpoints)
+    grid['endpoints2'] = endpoints
+    grid['points2'] = points
+    grid['stiffness2'] = stiffness
+
+    return grid
                 
 def create_endpoints(intervals):
     """Create endpoints from given intervals
@@ -275,6 +317,9 @@ def potential_maximum(potential, a, b, *params):
         a (float): left boundary of interval
         b (float): right boundary of interval
         params (args): potential specific parameters
+
+    Returns:
+        float
 
     """     
 

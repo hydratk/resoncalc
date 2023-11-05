@@ -26,43 +26,63 @@ def centrifugal(x, l=1, mu=1.0):
 
     return potential
 
-def morse(x, De=4.7446, a=1.440558, l=1.0, mu=1.0, re=0.7416):
+def morse(x, a=4.7446, b=1.440558, l=1.0, mu=1.0, c=0.7416):
     """Morse potential
 
     Args:
         x (float): variable
-        De (float): parameter, default 4.7446
-        a (float): parameter, default 1.440558
+        a (float): parameter, default 4.7446
+        b (float): parameter, default 1.440558
         l (int): secondary quantum number, default 1
         mu (float): reduced mass in atomic units, default 1
-        r (float): parameter, default 0.7416
+        c (float): parameter, default 0.7416
 
     Returns:
         function
 
     """    
 
-    potential = De*(1.0 - np.exp(-a * (x-re)))**2 - De + centrifugal(x, l, mu)
+    potential = a*(1.0 - np.exp(-b * (x-c)))**2 - a + centrifugal(x, l, mu)
 
     return potential
 
-def harmonic_gaussian(x, a=0.028, c=0.028, l=1.0, mu=1.0, b=1.0):
-    """Harmonic Gaussian potential
+def parabolic_gaussian(x, a=0.028, b=0.028, l=1.0, mu=1.0, c=1.0):
+    """Parabolic Gaussian potential
 
     Args:
         x (float): variable
         a (float): parameter, default 0.028        
-        c (float): parameter, default 0.028
+        b (float): parameter, default 0.028
         l (int): secondary quantum number, default 1
-        mu (float): reduced mass in atomic units, default
-        b (float): parameter, default 1.01
+        mu (float): reduced mass in atomic units, default 1
+        c (float): parameter, default 1.0
 
     Returns:
         function
 
     """    
 
-    potential = (a*x**2 - b) * np.exp(-c*x**2) + centrifugal(x, l, mu)
+    potential = (a*x**2 - c) * np.exp(-b*x**2) + centrifugal(x, l, mu)
+    
+    return potential
+
+def parabolic_gaussian2(x, a=0.028, b=0.028, l=1.0, mu=1.0, c=5.0):
+    """Parabolic Gaussian potential 2
+
+    Args:
+        x (float): variable
+        a (float): parameter, default 0.028        
+        b (float): parameter, default 0.028
+        l (int): secondary quantum number, default 1
+        mu (float): reduced mass in atomic units, default 1
+        c (float): parameter, default 5.0
+
+    Returns:
+        function
+
+    """    
+
+    potential = a*(x**2 - c) * np.exp(-b*x**2) + centrifugal(x, l, mu)
     
     return potential
 
@@ -107,7 +127,8 @@ def exponential(x, a, b, l=1.0, mu=1.0):
 # map title to function
 mapping = {
            'morse' : morse,
-           'harmonic_gaussian' : harmonic_gaussian,
+           'parabolic_gaussian' : parabolic_gaussian,
+           'parabolic_gaussian2' : parabolic_gaussian2,
            'gaussian' : gaussian,
            'exponential' : exponential
           }

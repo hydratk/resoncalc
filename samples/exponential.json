@@ -1,0 +1,16 @@
+{
+  "potential" : "exponential",
+  "nquad" : 15,
+  "emax" : 1.0,
+  "mu" : 1.0,
+  "l" : 1,
+  "intervals" : [
+                 {"a": 0.0,   "b": 5.0,     "elems": 20, "type": "equidistant"},
+                 {"a": 5.0,   "b": 100.0,   "elems": 15, "type": "progressive", "len": 0.5},
+                 {"a": 100.0, "b": 10000.0, "elems": 15, "type": "progressive", "len": 5.0}
+                ],
+  "params" : [
+              {"a": -0.32, "b": -0.25, "cnt": 30},
+              {"a": 0.3,  "b": 0.3,  "cnt": 1}
+             ]
+}   

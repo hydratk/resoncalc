@@ -325,7 +325,7 @@ def stiffness_matrix(n, endpoints):
 
     return matrix
 
-def hamiltonian(n, endpoints, potential, points, mu=1, *params):
+def hamiltonian(n, endpoints, potential, points, stiffness, mu=1, *params):
     """Calculate hamiltonian matrix
 
     Args:
@@ -333,6 +333,7 @@ def hamiltonian(n, endpoints, potential, points, mu=1, *params):
         endpoints (list): endpoints coordinates
         potential (func): potential function
         points (list): points where potential is calculated
+        stiffness (2d array): stifness matrix
         mu (float): reduced mass in atomic units, default 1
         params (args): potential specific parameters
 
@@ -347,7 +348,7 @@ def hamiltonian(n, endpoints, potential, points, mu=1, *params):
     h = 1                          # Planck's constant
 
     # kinetic term from stiffness matrix, boundary rows and column not used to satisfy boundary conditions
-    matrix = -h**2/(2*mu) * stiffness_matrix(n, endpoints)[1 : n_points-1, 1 : n_points-1]    
+    matrix = -h**2/(2*mu) * stiffness[1 : n_points-1, 1 : n_points-1]    
 
     # potential term, operator is diagonal
     potential_grid = np.zeros(n_points-2, dtype=np.complex_)

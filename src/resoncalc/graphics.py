@@ -310,8 +310,8 @@ def plot_resonances_params(infile, energy=True, outfile=''):
     plt.scatter(param1, param2, c=value, cmap=plt.cm.rainbow)    
     plt.colorbar()
     plt.title('Resonance states {0}'.format('energy' if (energy) else 'width'))
-    plt.xlabel('param 1')
-    plt.ylabel('param 2')
+    plt.xlabel('param a')
+    plt.ylabel('param b')
     plt.grid()
 
     # export graph

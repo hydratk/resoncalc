@@ -15,7 +15,7 @@ from json import load, JSONDecodeError
 def process_command():
     """Process command
 
-    usage: resoncalc.py [-h] [-o OUTPUT] [-v] [-s] [-g] input
+    usage: resoncalc [-h] [-o OUTPUT] [-v] [-s] [-g] [-t TITLE] input
 
     Calculate eigenstates for potential
 

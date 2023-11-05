@@ -1,0 +1,16 @@
+{
+  "potential" : "gaussian",
+  "nquad" : 15,
+  "emax" : 1.0,
+  "mu" : 1.0,
+  "l" : 1,
+  "intervals" : [
+                 {"a": 0.0,   "b": 9.0,     "elems": 20, "type": "equidistant"},
+                 {"a": 9.0,   "b": 100.0,   "elems": 15, "type": "progressive", "len": 0.6},
+                 {"a": 100.0, "b": 10000.0, "elems": 15, "type": "progressive", "len": 6.0}
+                ],
+  "params" : [
+              {"a": -18.0, "b": -13.0, "cnt": 30},
+              {"a": 3.0,  "b": 3.0,  "cnt": 1}
+             ]                                      
+}
