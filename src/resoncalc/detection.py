@@ -2,7 +2,7 @@
 """Detection
 
 .. module:: detection
-   :synopsis: Module for detection of eigenstates
+   :synopsis: Module for detection of states
 
 """
 
@@ -25,14 +25,14 @@ phases = [40.0, 30.0] # ecs phases
 prec = 1e-8           # ecs precision
 
 def perform_detection_loop(cfg):
-    """Perform eigenstate detection in loop using potential parameters variation 
+    """Perform state detection in loop using potential parameters variation 
 
     Args:
-        cfg (dict): configuration
+        cfg (dict): computation settings
 
     sample
     {
-     'title': 'test',
+     'title': 'run',
      'potential': 'gaussian',
      'nquad' : 15,
      'x0' : 0.0,
@@ -41,25 +41,25 @@ def perform_detection_loop(cfg):
      'emax' : 1.0,
      'mu' : 1.0,
      'l' : 1,
-     'intervals' : [
-                    {'a': 0.0,   'b': 9.0,     'elems': 15, 'type': 'equidistant'},
-                    {'a': 9.0,   'b': 100.0,   'elems': 15, 'type': 'progressive', 'len': 0.6},
-                    {'a': 100.0, 'b': 10000.0, 'elems': 15, 'type': 'progressive', 'len': 6.0}
-                   ],
      'params' : [
-                 {'a': -0.620, 'b': -0.560, 'cnt': 13},
-                 {'a': 0.1,    'b': 0.1,    'cnt': 1}
+                 {'start': -0.620, 'end': -0.560, 'cnt': 13},
+                 {'list': [0.4]}
                 ],
-     'params2' : [0.7416],
+     'params2' : [0.7416],     
+     'intervals' : [
+                    {'start': 0.0,   'end': 9.0,     'elems': 15, 'type': 'equidistant'},
+                    {'start': 9.0,   'end': 100.0,   'elems': 15, 'type': 'progressive', 'len': 0.6},
+                    {'start': 100.0, 'end': 10000.0, 'elems': 15, 'type': 'progressive', 'len': 6.0}
+                   ],
      'outstates' : ['bound', 'resonance'],
-     'outfiles' : ['eigenstates', 'eigenvalues', 'potential_grid', 'spectrum', 'log', 'test']
+     'outfiles' : ['states', 'eigenvalues', 'potential_grid', 'spectrum', 'log', 'settings']
     }
 
     """     
 
     # ranges
-    rng1 = np.linspace(cfg['params'][0]['a'], cfg['params'][0]['b'], cfg['params'][0]['cnt'])
-    rng2 = np.linspace(cfg['params'][1]['a'], cfg['params'][1]['b'], cfg['params'][1]['cnt'])
+    rng1 = cfg['params'][0]['list'] if ('list' in cfg['params'][0]) else np.linspace(cfg['params'][0]['start'], cfg['params'][0]['end'], cfg['params'][0]['cnt'])
+    rng2 = cfg['params'][1]['list'] if ('list' in cfg['params'][1]) else np.linspace(cfg['params'][1]['start'], cfg['params'][1]['end'], cfg['params'][1]['cnt'])
     total = len(rng1) * len(rng2)
 
     # optional parameters
@@ -81,10 +81,10 @@ def perform_detection_loop(cfg):
     # use all combinations of potential parameters
     start = time()
     output.set_outdir(title)
-    output.export_test(cfg)
-    output.info('Running test: {0} for potential: {1}, total tests: {2}'.format(title, cfg['potential'], total))
+    output.export_settings(cfg)
+    output.info('Running computation: {0} for potential: {1}, total computations: {2}'.format(title, cfg['potential'], total))
     test = 1
-    eigenstates = []
+    states = []
     params = []
 
     try:        
@@ -101,8 +101,8 @@ def perform_detection_loop(cfg):
 
                 # detection
                 try:
-                    states = perform_detection(potential.mapping[cfg['potential']], nquad, emax, mu, cfg['intervals'], grid,
-                                               param1, param2, l, mu, *params2)
+                    states2 = perform_detection(potential.mapping[cfg['potential']], nquad, emax, mu, cfg['intervals'], grid,
+                                                param1, param2, l, mu, *params2)
 
                 # exceptions handled outside
                 except KeyboardInterrupt as ex:
@@ -112,24 +112,24 @@ def perform_detection_loop(cfg):
                 
                 # logged exception
                 except Exception as ex:
-                    states = None
+                    states2 = None
                     output.error('Exception {0}'.format(ex))
 
                 # states detected
-                if (states is not None):
-                    for state in states:
-                        eigenstates.append(state)
+                if (states2 is not None):
+                    for state in states2:
+                        states.append(state)
                         params.append((param1, param2, l))
                 
                 test += 1
 
-        # export eigenstates
-        output.export_eigenstates(params, eigenstates)
-        output.info('Tests finished after {0}s'.format(round(time() - start, 1)))
+        # export states
+        output.export_states(params, states)
+        output.info('Computations finished after {0}s'.format(round(time() - start, 1)))
 
-    # export already detected eigenstates    
+    # export already detected states    
     except KeyboardInterrupt as ex:
-        output.export_eigenstates(params, eigenstates)
+        output.export_states(params, states)
         raise KeyboardInterrupt
 
     # output directory deleted
@@ -137,18 +137,18 @@ def perform_detection_loop(cfg):
         print('Output directory {0} not found'.format(output.outdir))
 
 def perform_detection(potential, n, emax, mu, intervals, grid, *params):
-    """Perform eigenstate detection for one potential configuration
+    """Perform state detection for one potential settings
 
     Args:
         potential (func): potential function
         n (int): order of quadrature
         emax (float): maximum energy in atomic units
         mu (float): reduced mass in atomic units
-        intervals (dict): interval configuration             
+        intervals (dict): interval settings             
         params (args): potential specific parameters
 
     Returns:
-        list: eigenstates
+        list: states
 
     """    
 
@@ -172,23 +172,24 @@ def perform_detection(potential, n, emax, mu, intervals, grid, *params):
     eigenvalues2 = femdvr.spectrum(matrix)
     output.export_eigenvalues(eigenvalues2, phase, *params)
 
-    # detect eigenstate
-    output.debug('Detecting eigenstate')
+    # detect state
+    output.debug('Detecting state')
     init_point = grid['endpoints1'][1]
     potmax = potential_maximum(potential, np.real(init_point), np.real(init_point)+20.0, *params)
     states = detect_states(emax, potmax, eigenvalues1, eigenvalues2)
     
     if (states is not None):
         for state in states:
-            output.info('Detected eigenstate real: {0:e}, imag: {1:e}, type: {2}'.format(np.real(state), np.imag(state), get_state_type(state)))
+            value = state['value']
+            output.info('Detected state real: {0:e}, imag: {1:e}, type: {2}'.format(np.real(value), np.imag(value), get_state_type(value)))
 
         # plot spectrum
         output.export_complex_spectrum_fig(eigenvalues1, eigenvalues2, states, *params)
 
-        # plot eigenstates 
-        output.export_eigenstates_fig(potential, states, np.real(init_point), np.real(init_point)+20.0, emax, *params)
+        # plot potential 
+        output.export_potential_fig(potential, states, np.real(init_point), np.real(init_point)+20.0, emax, *params)
     else:
-        output.info('Eigenstate not detected')
+        output.info('State not detected')
 
     return states
 
@@ -197,7 +198,7 @@ def create_grid(n, intervals):
 
     Args:
         n (int): order of quadrature
-        intervals (dict): interval configuration
+        intervals (dict): interval settings
 
     Returns:
         dict: endpoints1, points1, stiffness1
@@ -232,7 +233,7 @@ def create_endpoints(intervals):
     """Create endpoints from given intervals
 
     Args:
-        intervals (dict): interval configuration
+        intervals (dict): interval settings
 
     Returns:
         list: endpoints
@@ -244,10 +245,10 @@ def create_endpoints(intervals):
 
         # equistant endpoints
         if (interval['type'] == 'equidistant'):
-            endpoints.append(femdvr.equidistant_endpoints(interval['a'], interval['b'], interval['elems']))
+            endpoints.append(femdvr.equidistant_endpoints(interval['start'], interval['end'], interval['elems']))
         # progressive endpoints
         elif (interval['type'] == 'progressive'):
-            endpoints.append(femdvr.progressive_endpoints(interval['a'], interval['b'], interval['elems'], interval['len']))
+            endpoints.append(femdvr.progressive_endpoints(interval['start'], interval['end'], interval['elems'], interval['len']))
 
     # merge intervals
     endpoints = femdvr.merge_endpoints(endpoints)
@@ -255,7 +256,7 @@ def create_endpoints(intervals):
     return endpoints
 
 def detect_states(emax, potmax, eigenvalues1, eigenvalues2):
-    """Detect eigenstates using ECS method executed twice
+    """Detect states using ECS method executed twice
 
     Args:
         emax (float): maximum energy in atomic units
@@ -264,7 +265,7 @@ def detect_states(emax, potmax, eigenvalues1, eigenvalues2):
         eigenvalues2 (list): eigenvalues for second phase
 
     Returns:
-        list: eigenstates
+        list: states
 
     """    
 
@@ -277,12 +278,14 @@ def detect_states(emax, potmax, eigenvalues1, eigenvalues2):
         if (np.real(eigenvalues2[i]) <= maximum):
             vals2.append(eigenvalues2[i])
 
-    # find eigenstate independent on phase    
+    # find state independent on phase    
     states = []
     for i in range(len(vals1)):
         for j in range(len(vals2)):
-            if (np.abs(vals1[i] - vals2[j]) < prec):
-                states.append((vals1[i] + vals2[j])/2.0)
+            abserr = np.abs(vals1[i] - vals2[j])
+            if (abserr < prec):
+                value = (vals1[i] + vals2[j])/2.0
+                states.append({'value' : value, 'abserr' : abserr, 'relerr' : abserr / np.abs(value)})
 
     # not detected
     if (len(states) == 0):
@@ -290,15 +293,15 @@ def detect_states(emax, potmax, eigenvalues1, eigenvalues2):
 
     # sort states
     else:
-        states = sorted(states)
+        states = sorted(states, key=lambda v: v['value'])
 
     return states
 
 def get_state_type(state):
-    """Get eigenstate type
+    """Get state type
 
     Args:
-        state (complex): eigenstate
+        state (complex): state
 
     Returns:
         str

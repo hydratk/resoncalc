@@ -6,13 +6,13 @@
   "emax" : 1.0,
   "mu" : 1.0,
   "l" : 1,
-  "intervals" : [
-                 {"a": 0.0,   "b": 10.0,  "elems": 20, "type": "equidistant"},
-                 {"a": 10.0,  "b": 100.0, "elems": 15, "type": "progressive", "len": 0.5}
-                ],
   "params" : [
-              {"a": 4.2, "b": 4.7, "cnt": 30},
-              {"a": 4.5, "b": 4.5, "cnt": 1}
+              {"start": 4.2, "end": 4.7, "cnt": 30},
+              {"start": 4.5, "end": 4.5, "cnt": 1}
              ],
-  "params2" : [0.7416]
+  "params2" : [0.7416],  
+  "intervals" : [
+                 {"start": 0.0,   "end": 10.0,  "elems": 20, "type": "equidistant"},
+                 {"start": 10.0,  "end": 100.0, "elems": 15, "type": "progressive", "len": 0.5}
+                ]
 }

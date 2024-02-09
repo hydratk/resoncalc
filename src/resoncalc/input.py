@@ -17,10 +17,10 @@ def process_command():
 
     usage: resoncalc [-h] [-o OUTPUT] [-v] [-s] [-g] [-t TITLE] input
 
-    Calculate eigenstates for potential
+    Calculate bound states and resonances for potential
 
     positional arguments:
-      input                 input file
+      input                 input file with computation settings
 
     options:
       -h, --help            show this help message and exit
@@ -34,8 +34,8 @@ def process_command():
     """     
 
     # command options
-    parser = ArgumentParser(description='Calculate eigenstates for potential')
-    parser.add_argument('string', metavar='input', help='input file')
+    parser = ArgumentParser(description='Calculate bound states and resonances for potential')
+    parser.add_argument('string', metavar='input', help='input file with computation settings')
     parser.add_argument('-o', '--output', help='output directory')
     parser.add_argument('-v', '--verbose', action='store_true', help='verbose mode')
     parser.add_argument('-s', '--silent', action='store_true', help='silent mode')
@@ -70,56 +70,56 @@ def process_command():
 
     # input
     infile = args.string
-    tests = None
+    computations = None
     if (path.exists(infile)):
         if (generate):
             output.generate_graphs(infile, title)
             return 0
         else:
-            tests = load_input(infile)
+            computations = load_input(infile)
     else:
         print('Input file {0} not found'.format(infile))
         return -1
 
-    # test processing
-    if (tests is not None):
+    # computation processing
+    if (computations is not None):
         try:
-            process_tests(tests)
+            process_computations(computations)
             return 0
         except KeyboardInterrupt as ex:
             print('Program terminated by user')
             return -1
 
 def load_input(fname):
-    """Load input tests file
+    """Load input computations file
 
     Args:
         fname (str): input filename
 
     Returns:
-        list: tests
+        list: computations
 
     """     
 
     try:
         with open(fname, 'r') as f:
-            tests = load(f)
-            if (type(tests) is not list):
-                tests = [tests]
+            computations = load(f)
+            if (type(computations) is not list):
+                computations = [computations]
 
-            return tests
+            return computations
         
     except JSONDecodeError as ex:
         print('Failed to parse input file {0}: {1}'.format(fname, ex))
         return None
 
-def process_tests(tests):
-    """Process tests
+def process_computations(computations):
+    """Process computations
 
     Args:
-        tests (list): tests configuration
+        computations (list): computations settings
 
     """        
 
-    for test in tests:
-        detection.perform_detection_loop(test)
+    for computation in computations:
+        detection.perform_detection_loop(computation)

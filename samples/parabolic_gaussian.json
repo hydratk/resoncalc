@@ -6,15 +6,15 @@
   "emax" : 1.0,
   "mu" : 1.0,
   "l" : 1,
-  "intervals" : [
-                 {"a": 0.0,   "b": 10.0,    "elems": 40, "type": "equidistant"},
-                 {"a": 10.0,  "b": 150.0,   "elems": 30, "type": "progressive", "len": 0.5},
-                 {"a": 150.0, "b": 10000.0, "elems": 15, "type": "progressive", "len": 5.0}
-                ],
   "params" : [
-              {"a": 0.018, "b": 0.059, "cnt": 20},
-              {"a": 0.022, "b": 0.022,  "cnt": 1}
+              {"start": 0.018, "end": 0.059, "cnt": 20},
+              {"start": 0.022, "end": 0.022,  "cnt": 1}
              ],
-  "params2" : [1.0],
+  "params2" : [1.0],  
+  "intervals" : [
+                 {"start": 0.0,   "end": 10.0,    "elems": 40, "type": "equidistant"},
+                 {"start": 10.0,  "end": 150.0,   "elems": 30, "type": "progressive", "len": 0.5},
+                 {"start": 150.0, "end": 10000.0, "elems": 15, "type": "progressive", "len": 5.0}
+                ],
   "outstates" : ["resonance"]
 } 

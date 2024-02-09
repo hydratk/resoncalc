@@ -1,5 +1,5 @@
 # resoncalc
-Calculate eigenstates for onedimensional potential.
+Calculate bound states and resonances for potential.
 
 ## User manual
 
@@ -24,10 +24,10 @@ sympy>=1.12
 usage: resoncalc [-h] [-o OUTPUT] [-v] [-s] [-g] 
                  [-t TITLE] input
 
-Calculate eigenstates for potential
+Calculate bound states and resonances for potential
 
 positional arguments:
-  input                 input file
+  input                 input file with computation settings
 
 options:
   -h, --help            show this help message and exit
@@ -48,14 +48,17 @@ See directory _samples_ for more samples.
 ```
 {
   "potential" : "gaussian",
-  "intervals" : [
-    {"a": 0.0,   "b": 9.0,     "elems": 15, "type": "equidistant"},
-    {"a": 9.0,   "b": 100.0,   "elems": 15, "type": "progressive", "len": 0.6},
-    {"a": 100.0, "b": 10000.0, "elems": 15, "type": "progressive", "len": 6.0}
-  ],
   "params" : [
-    {"a": -0.62, "b": -0.56, "cnt": 13},
-    {"a": 0.1,   "b": 0.2,   "cnt": 5}
+    {"start": -0.62, "end": -0.56, "cnt": 13},
+    {"start": 0.1,   "end": 0.2,   "cnt": 5}
+  ],
+  "intervals" : [
+    {"start": 0.0,   "end": 9.0,   "elems": 15, 
+     "type": "equidistant"},
+    {"start": 9.0,   "end": 100.0, "elems": 15, 
+     "type": "progressive", "len": 0.6},
+    {"start": 100.0, "end": 10000.0, "elems": 15, 
+     "type": "progressive", "len": 6.0}
   ]
 } 
 ```
@@ -63,7 +66,7 @@ See directory _samples_ for more samples.
 #### With optional parameters
 ```
 {
-  "title" : "test1",
+  "title" : "run1",
   "potential" : "parabolic_gaussian",
   "nquad" : 15,
   "x0" : 0.0,
@@ -72,17 +75,20 @@ See directory _samples_ for more samples.
   "emax" : 1.0,
   "mu" : 1.0,
   "l" : 1,
-  "intervals" : [
-    {"a": 0.0,   "b": 10.0,  "elems": 20, "type": "equidistant"},
-    {"a": 10.0,  "b": 150.0, "elems": 15, "type": "progressive", "len": 0.5}
-   ],
   "params" : [
-    {"a": 0.028, "b": 0.028, "cnt": 1},
-    {"a": 0.028, "b": 0.029, "cnt": 10}
+    {"list": [0.028]},
+    {"start": 0.028, "end": 0.029, "cnt": 10}
   ],
   "params2" : [1.0],
+  "intervals" : [
+    {"start": 0.0,   "end": 10.0,  "elems": 20, 
+     "type": "equidistant"},
+    {"start": 10.0,  "end": 150.0, "elems": 15, 
+     "type": "progressive", "len": 0.5}
+   ],
   "outstates" : ["bound", "resonance"],
-  "outfiles" : ["eigenstates", "eigenvalues", "potential_grid", "spectrum", "log", "test"]
+  "outfiles" : ["states", "eigenvalues", "potential_grid", 
+                "spectrum", "log", "settings"]
 } 
 ```
 
@@ -96,10 +102,10 @@ See directory _samples_ for more samples.
 - _emax_: maximum detected energy in atomic units
 - _mu_: reduced mass in atomic units
 - _l_: secondary quantum number
-- _intervals_: element definition for FEM-DVR method in interval [a,b] and given count of elements and division
-- _params_: potential parameters definition in interval [a,b] and given count       
+- _params_: potential parameters definition in interval [start,end] and given count, alternatively list of values       
 - _params2_: other potential parameters not changed during calculation
-- _outstates_: types of generated eigenstates, default all
+- _intervals_: element definition for FEM-DVR method in interval [start,end] and given count of elements and division
+- _outstates_: types of generated states, default all
 - _outfiles_: types of generated output files, default all
 
 #### Potentials

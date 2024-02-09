@@ -22,7 +22,7 @@ entry_points = {
 setup(
     name='resoncalc',
     version='0.1.0',
-    description='Calculate resonances eigenstates for radial symmetric potential',
+    description='Calculate bound states and resonances for potential',
     long_description=readme,
     author='Petr Rasek',
     author_email='petr.rasek.w@gmail.com',

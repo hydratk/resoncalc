@@ -90,8 +90,8 @@ def exterior_complex_scaling(endpoints, x0, phase):
 
     Args:
         endpoints (list): endpoints coordinates
-        x0 (float): centre of rotation
-        phase (int): angle of rotation in degrees
+        x0 (float): point
+        phase (int): angle in degrees
 
     Returns:
         list: endpoints 

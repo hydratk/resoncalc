@@ -14,7 +14,7 @@ def centrifugal(x, l=1, mu=1.0):
 
     Args:
         x (float): variable 
-        l (int): secondary quantum number, default 1
+        l (int): angular momentum, default 1
         mu (float): reduced mass in atomic units, default 1
 
     Returns:
@@ -33,7 +33,7 @@ def morse(x, a=4.7446, b=1.440558, l=1.0, mu=1.0, c=0.7416):
         x (float): variable
         a (float): parameter, default 4.7446
         b (float): parameter, default 1.440558
-        l (int): secondary quantum number, default 1
+        l (int): angular momentum, default 1
         mu (float): reduced mass in atomic units, default 1
         c (float): parameter, default 0.7416
 
@@ -53,7 +53,7 @@ def parabolic_gaussian(x, a=0.028, b=0.028, l=1.0, mu=1.0, c=1.0):
         x (float): variable
         a (float): parameter, default 0.028        
         b (float): parameter, default 0.028
-        l (int): secondary quantum number, default 1
+        l (int): angular momentum, default 1
         mu (float): reduced mass in atomic units, default 1
         c (float): parameter, default 1.0
 
@@ -73,7 +73,7 @@ def parabolic_gaussian2(x, a=0.028, b=0.028, l=1.0, mu=1.0, c=5.0):
         x (float): variable
         a (float): parameter, default 0.028        
         b (float): parameter, default 0.028
-        l (int): secondary quantum number, default 1
+        l (int): angular momentum, default 1
         mu (float): reduced mass in atomic units, default 1
         c (float): parameter, default 5.0
 
@@ -93,7 +93,7 @@ def gaussian(x, a, b, l=1.0, mu=1.0):
         x (float): variable
         a (float): parameter
         b (float): parameter
-        l (int): secondary quantum number, default 1
+        l (int): angular momentum, default 1
         mu (float): reduced mass in atomic units, default 1
 
     Returns:
@@ -112,7 +112,7 @@ def exponential(x, a, b, l=1.0, mu=1.0):
         x (float): variable
         a (float): parameter
         b (float): parameter
-        l (int): secondary quantum number, default 1
+        l (int): angular momentum, default 1
         mu (float): reduced mass in atomic units, default 1
 
     Returns:

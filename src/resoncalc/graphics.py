@@ -110,12 +110,12 @@ def plot_potential(potential, a, b, *params):
     plt.tight_layout()
     plt.show()
 
-def plot_eigenstates(potential, eigenvalues, a, b, emax, fname='', *params):
-    """Plot eigenstates for given potential
+def plot_states(potential, states, a, b, emax, fname='', *params):
+    """Plot states for given potential
 
     Args:
         potential (func): potential function
-        eigenvalues (list): bound states
+        eigenvalues (list): states
         a (float): left boundary of interval
         b (float): right boundary of interval
         emax (float): maximum energy in atomic units
@@ -125,7 +125,7 @@ def plot_eigenstates(potential, eigenvalues, a, b, emax, fname='', *params):
     """    
 
     # coordinates init
-    eigenvalues = np.real(eigenvalues)
+    states = [np.real(v['value']) for v in states]
     x = np.linspace(a, b, n_points)
     n = len(x)
     y = np.zeros(n, dtype=float)
@@ -135,25 +135,24 @@ def plot_eigenstates(potential, eigenvalues, a, b, emax, fname='', *params):
         y[i] = potential(x[i], *params)
     plt.plot(x, y)
 
-    # plot eigenstates
-    for i in range(len(eigenvalues)):
+    # plot states
+    for i in range(len(states)):
         z = np.zeros(n, dtype=float)
-        val = eigenvalues[i]
-        bound_state = True if (val < 0.0) else False
+        val = states[i]
         cross = 0
 
-        # line segment representing eigenstate
+        # line segment representing state
         for j in range(n):
             
             # intersection points with potential
             if (val > y[j]):
-                if (cross == 0 or (cross == 2 and not bound_state)):
+                if (cross == 0):
                     cross += 1
             elif (cross == 1):
                 cross += 1
 
             # plot line
-            if ((bound_state and cross == 1) or (not bound_state and cross == 2)):
+            if (cross == 1):
                 z[j] = val
             else:
                 z[j] = np.nan
@@ -163,11 +162,11 @@ def plot_eigenstates(potential, eigenvalues, a, b, emax, fname='', *params):
     # create graph
     plt.xlim(left=a, right=b)
     plt.ylim(bottom=None, top=emax)
-    plt.title('Eigenstates')
+    plt.title('Potential')
     plt.xlabel('x')
     plt.ylabel('E')
     plt.grid()
-    plt.legend(bbox_to_anchor=(1, 1), borderaxespad=0.0, ncol=ceil(len(eigenvalues)/n_rows))
+    plt.legend(bbox_to_anchor=(1, 1), borderaxespad=0.0, ncol=ceil(len(states)/n_rows))
     plt.tight_layout()
 
     # export graph
@@ -185,7 +184,7 @@ def plot_complex_spectrum(eigenvalues, eigenvalues2=[], states=None, fname=''):
     Args:
         eigenvalues (list): eigenvalues for first angle or rotation
         eigenvalues2 (list): eigenvalues for second angle of rotation, default empty
-        states (list): highlighted eigenstates
+        states (list): highlighted states
         fname (str): export filename
 
     """    
@@ -193,11 +192,11 @@ def plot_complex_spectrum(eigenvalues, eigenvalues2=[], states=None, fname=''):
     # plot first eigenvalues    
     x = []
     y = []
-    if (states is None):
+    if (states is None):        
         x = np.real(eigenvalues)
         y = np.imag(eigenvalues)
     else:
-        limit = np.abs(states[0])
+        limit = np.abs(states[0]['value'])
         for val in eigenvalues:
             if (np.real(val) <= limit):
                 x.append(np.real(val))
@@ -213,7 +212,7 @@ def plot_complex_spectrum(eigenvalues, eigenvalues2=[], states=None, fname=''):
             x = np.real(eigenvalues2)
             y = np.imag(eigenvalues2)
         else:
-            limit = np.abs(states[0])
+            limit = np.abs(states[0]['value'])
             for val in eigenvalues2:
                 if (np.real(val) <= limit):
                     x.append(np.real(val))
@@ -221,10 +220,11 @@ def plot_complex_spectrum(eigenvalues, eigenvalues2=[], states=None, fname=''):
 
     plt.plot(x, y, 'g.')
 
-    # highlight eigenstates
+    # highlight states
     if (states is not None):
         for state in states:
-            plt.plot(np.real(state), np.imag(state), 'ro', label='real={0:e}, imag={1:e}'.format(np.real(state), np.imag(state)))
+            value = state['value']
+            plt.plot(np.real(value), np.imag(value), 'ro', label='real={0:e}, imag={1:e}'.format(np.real(value), np.imag(value)))
         plt.legend(loc='lower left')
 
     # create graph    
@@ -270,7 +270,7 @@ def plot_resonances_complex(infile, outfile=''):
         plt.plot(np.real(v), np.imag(v), 'b-')
 
     # create graph    
-    plt.title('Resonance states')
+    plt.title('Resonances')
     plt.xlabel('Re')
     plt.ylabel('Im')
     plt.grid()
@@ -309,7 +309,7 @@ def plot_resonances_params(infile, energy=True, outfile=''):
     # create graph
     plt.scatter(param1, param2, c=value, cmap=plt.cm.rainbow)    
     plt.colorbar()
-    plt.title('Resonance states {0}'.format('energy' if (energy) else 'width'))
+    plt.title('Resonance {0}'.format('energy' if (energy) else 'width'))
     plt.xlabel('param a')
     plt.ylabel('param b')
     plt.grid()

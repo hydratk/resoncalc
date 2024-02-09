@@ -4,13 +4,13 @@
   "emax" : 1.0,
   "mu" : 1.0,
   "l" : 1,
-  "intervals" : [
-                 {"a": 0.0,   "b": 5.0,     "elems": 20, "type": "equidistant"},
-                 {"a": 5.0,   "b": 100.0,   "elems": 15, "type": "progressive", "len": 0.5},
-                 {"a": 100.0, "b": 10000.0, "elems": 15, "type": "progressive", "len": 5.0}
-                ],
   "params" : [
-              {"a": -0.32, "b": -0.25, "cnt": 30},
-              {"a": 0.3,  "b": 0.3,  "cnt": 1}
-             ]
+              {"start": -0.32, "end": -0.25, "cnt": 30},
+              {"start": 0.3,   "end": 0.3,  "cnt": 1}
+             ],  
+  "intervals" : [
+                 {"start": 0.0,   "end": 5.0,     "elems": 20, "type": "equidistant"},
+                 {"start": 5.0,   "end": 100.0,   "elems": 15, "type": "progressive", "len": 0.5},
+                 {"start": 100.0, "end": 10000.0, "elems": 15, "type": "progressive", "len": 5.0}
+                ]
 }   

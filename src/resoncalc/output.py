@@ -19,8 +19,8 @@ outdir = ''   # output directory
 logfile = ''  # log filename
 log_level = 1 # log level 0 - ERROR, 1 - INFO, 2 - DEBUG
 stdout = True # write to standard output
-outstates = ['bound', 'resonance'] # exported eigenstates
-outfiles = ['eigenstates', 'eigenvalues', 'potential_grid', 'spectrum', 'log', 'test'] # generated output files
+outstates = ['bound', 'resonance'] # exported states
+outfiles = ['states', 'eigenvalues', 'potential_grid', 'spectrum', 'log', 'settings'] # generated output files
 
 def set_outdir(dirname):
     """Set output directory
@@ -101,25 +101,25 @@ def format_params(*params):
 
     return params_formatted
 
-def export_test(cfg):
-    """Export test configuration to file
+def export_settings(settings):
+    """Export computation settings to file
 
     Args:
-        cfg (dict): test configuration
+        settings (dict): computation settings
 
     """  
 
     # output enabled
-    if ('test' in outfiles):
+    if ('settings' in outfiles):
 
-        fname = path.join(outdir, '{0}.json'.format(cfg['potential']))
-        debug('Exporting test configuration')
+        fname = path.join(outdir, '{0}.json'.format(settings['potential']))
+        debug('Exporting computation settings')
 
         with open(fname, 'a+') as f:
-            f.write(dumps(cfg, indent=2))
+            f.write(dumps(settings, indent=2))
 
-def export_eigenstates(params, eigenstates):
-    """Export eigenstates to file
+def export_states(params, states):
+    """Export states to file
 
     Args:
         params (list): potential parameters
@@ -127,20 +127,21 @@ def export_eigenstates(params, eigenstates):
 
     """  
 
-    fname = path.join(outdir, 'eigenstates.csv')
-    debug('Exporting eigenstates')
-    header = 'param1,param2,l,real,imag,type\n'
+    fname = path.join(outdir, 'states.csv')
+    debug('Exporting states')
+    header = 'param1,param2,l,real,imag,type,abserr,relerr\n'
 
     with open(fname, 'a+') as f:
         f.write(header)
         
-        for i in range(len(eigenstates)):
+        for i in range(len(states)):
             
             # state enabled
-            state_type = detection.get_state_type(eigenstates[i])
+            value = states[i]['value']
+            state_type = detection.get_state_type(value)
             if (state_type in outstates):
-                f.write('{0},{1},{2},{3:e},{4:e},{5}\n'.format(round(params[i][0], 5), round(params[i][1], 5), params[i][2], np.real(eigenstates[i]),
-                                                               np.imag(eigenstates[i]), state_type))
+                f.write('{0},{1},{2},{3:e},{4:e},{5},{6:e},{7:e}\n'.format(round(params[i][0], 5), round(params[i][1], 5), params[i][2], np.real(value),
+                                                                           np.imag(value), state_type, states[i]['abserr'], states[i]['relerr']))
 
 def export_eigenvalues(eigenvalues, phase, *params):
     """Export eigenvalues to file
@@ -194,7 +195,7 @@ def export_complex_spectrum_fig(eigenvalues1, eigenvalues2, states, *params):
     Args:
         eigenvalues (list): eigenvalues for first angle or rotation
         eigenvalues2 (list): eigenvalues for second angle of rotation
-        states (list): highlighted eigenstates        
+        states (list): highlighted states        
         params (args): potential parameters
 
     """  
@@ -205,12 +206,12 @@ def export_complex_spectrum_fig(eigenvalues1, eigenvalues2, states, *params):
         debug('Exporting complex spectrum figure')
         graphics.plot_complex_spectrum(eigenvalues1, eigenvalues2, states, fname)
 
-def export_eigenstates_fig(potential, states, a, b, emax, *params):
-    """Export eigenstates to figure
+def export_potential_fig(potential, states, a, b, emax, *params):
+    """Export potential to figure
 
     Args:
         potential (func): potential function
-        states (list): eigenstates
+        states (list): states
         a (float): left boundary of interval
         b (float): right boundary of interval
         emax (float): maximum energy in atomic units
@@ -219,10 +220,10 @@ def export_eigenstates_fig(potential, states, a, b, emax, *params):
     """ 
 
     # output enabled
-    if ('eigenstates' in outfiles):
-        fname = path.join(outdir, 'eigenstates_{0}.png'.format(format_params(*params)))
-        debug('Exporting eigenstates figure')
-        graphics.plot_eigenstates(potential, states, a, b, emax, fname, *params)    
+    if ('states' in outfiles):
+        fname = path.join(outdir, 'potential_{0}.png'.format(format_params(*params)))
+        debug('Exporting potential figure')
+        graphics.plot_states(potential, states, a, b, emax, fname, *params)    
 
 def generate_graphs(infile, title=None):
     """Generate graphs from input
