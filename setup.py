@@ -21,9 +21,10 @@ entry_points = {
 
 setup(
     name='resoncalc',
-    version='0.1.0',
+    version='0.1.1',
     description='Calculate bound states and resonances for potential',
     long_description=readme,
+    long_description_content_type='text/markdown',
     author='Petr Rasek',
     author_email='petr.rasek.w@gmail.com',
     url='https://github.com/hydratk/resoncalc',
