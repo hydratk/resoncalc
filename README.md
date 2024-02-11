@@ -40,9 +40,15 @@ options:
                         output title, used for generate
 ```
 
+Typical usage for states calculation and graphs generation
+```
+resoncalc input/settings.json -o output
+resoncalc input/data.csv -o output -g -t test
+```
+
 ### Sample tests
 
-See directory _samples_ for more samples.
+See folder _samples/settings_ for more samples.
 
 #### With mandatory parameters
 ```
@@ -98,7 +104,7 @@ See directory _samples_ for more samples.
 - _nquad_: order of quadrature polynomials
 - _x0_: center for ECS method, default 0
 - _phases_: 2 phases for ECS method, default 40, 30
-- _prec_: eigenstates detection precision, default 1e-8
+- _prec_: states detection precision, default 1e-8
 - _emax_: maximum detected energy in atomic units
 - _mu_: reduced mass in atomic units
 - _l_: secondary quantum number
@@ -117,3 +123,23 @@ See file _potential.py_ for definition.
 - _parabolic_gaussian2_
 
 You can also add your potential, just create new function and add it to mapping.
+Sample settings files for all potential are available in folder _samples/settings_.
+
+### Output
+
+Sample output for states calculation is available in folder _samples/output_.
+
+- _states.csv_: detected bound states and resonances
+- _spectrum_par1_par2_l.png_: complex spectrum with highlighted bound states and resonances and eigenvalues for given parameters and both ECS phases
+- _potential_par1_par2_l.png_: potential with highlighted bound states and resonances for given parameters
+- _eigenvalues_par1_par_l.phase.csv_: eigenvalues for given parameters and phase
+- _potential_grid_par1_par2_l_phase.csv_: potential values on grid for given parameters and phase
+- _gaussian.json_: copy of input settings
+- _log.log_: application log, more detailed in verbose mode
+
+Sample output for graphs generation is available in folde _samples/generate_.
+
+- _gaussian.csv_ input file with resonances for gaussian potential
+- _resonances_complex_gaussian.png_: complex spectrum
+- _resonances_energy_gaussian.png_: resonance energy
+- _resonances_width_gaussian.png_: resonance width
