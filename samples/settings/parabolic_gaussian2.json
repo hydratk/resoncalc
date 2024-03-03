@@ -1,7 +1,7 @@
 {
   "potential" : "parabolic_gaussian2",
   "nquad" : 15,
-  "x0" : 1.0,
+  "r0" : 1.0,
   "phases" : [40.0, 30.0],
   "emax" : 10.0,
   "mu" : 1.0,

@@ -6,7 +6,7 @@ Calculate bound states and resonances for potential.
 ### Installation 
 
 ```
-pip install git+https://github.com/hydratk/resoncalc.git
+pip install resoncalc
 ```
 
 Requirements
@@ -75,7 +75,7 @@ See folder _samples/settings_ for more samples.
   "title" : "run1",
   "potential" : "parabolic_gaussian",
   "nquad" : 15,
-  "x0" : 0.0,
+  "r0" : 0.0,
   "phases" : [40.0, 30.0],
   "prec" : 1e-8,
   "emax" : 1.0,
@@ -102,7 +102,7 @@ See folder _samples/settings_ for more samples.
 - _title_: output directory name, by default according to potential
 - _potential_: potential from list
 - _nquad_: order of quadrature polynomials
-- _x0_: center for ECS method, default 0
+- _r0_: center for ECS method, default 0
 - _phases_: 2 phases for ECS method, default 40, 30
 - _prec_: states detection precision, default 1e-8
 - _emax_: maximum detected energy in atomic units

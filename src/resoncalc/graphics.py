@@ -104,7 +104,7 @@ def plot_potential(potential, a, b, *params):
 
     # create graph
     plt.title('Potential')
-    plt.xlabel('x')
+    plt.xlabel('r')
     plt.ylabel('E')
     plt.grid()
     plt.tight_layout()
@@ -163,7 +163,7 @@ def plot_states(potential, states, a, b, emax, fname='', *params):
     plt.xlim(left=a, right=b)
     plt.ylim(bottom=None, top=emax)
     plt.title('Potential')
-    plt.xlabel('x')
+    plt.xlabel('r')
     plt.ylabel('E')
     plt.grid()
     plt.legend(bbox_to_anchor=(1, 1), borderaxespad=0.0, ncol=ceil(len(states)/n_rows))

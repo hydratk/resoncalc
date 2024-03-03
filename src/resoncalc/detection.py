@@ -20,7 +20,7 @@ nquad = 15            # order of quadrature
 emax = 1.0            # maximum energy in atomic units
 mu = 1.0              # reduced mass in atomic units
 l = 1                 # secondar quantum number
-x0 = 0.0              # ecs point x0
+r0 = 0.0              # ecs point r0
 phases = [40.0, 30.0] # ecs phases
 prec = 1e-8           # ecs precision
 
@@ -35,7 +35,7 @@ def perform_detection_loop(cfg):
      'title': 'run',
      'potential': 'gaussian',
      'nquad' : 15,
-     'x0' : 0.0,
+     'r0' : 0.0,
      'phases' : [40.0, 30.0],
      'prec' : 1e-8,
      'emax' : 1.0,
@@ -68,7 +68,7 @@ def perform_detection_loop(cfg):
     globals()['emax'] = cfg['emax'] if ('emax' in cfg) else globals()['emax']
     globals()['mu'] = cfg['mu'] if ('mu' in cfg) else globals()['mu']
     globals()['l'] = cfg['l'] if ('l' in cfg) else globals()['l']
-    globals()['x0'] = cfg['x0'] if ('x0' in cfg) else globals()['x0']
+    globals()['r0'] = cfg['r0'] if ('r0' in cfg) else globals()['r0']
     globals()['phases'] = cfg['phases'] if ('phases' in cfg) else globals()['phases'] 
     globals()['prec'] = cfg['prec'] if ('prec' in cfg) else globals()['prec']
     params2 = cfg['params2'] if ('params2' in cfg) else []    
@@ -97,7 +97,7 @@ def perform_detection_loop(cfg):
             # param2 loop
             for param2 in rng2:
 
-                output.info('Test: {0}/{1}, parameters: {2}, {3}'.format(test, total, round(param1, 5), round(param2, 5)))
+                output.info('Computation: {0}/{1}, parameters: {2}, {3}'.format(test, total, round(param1, 5), round(param2, 5)))
 
                 # detection
                 try:
@@ -154,7 +154,7 @@ def perform_detection(potential, n, emax, mu, intervals, grid, *params):
 
     # spectrum for first ECS phase
     phase = phases[0]
-    output.debug('Using ECS x0: {0}, phase: {1}'.format(x0, phase))
+    output.debug('Using ECS r0: {0}, phase: {1}'.format(r0, phase))
     output.debug('Creating Hamiltonian matrix')
     matrix, potential_grid = femdvr.hamiltonian(n, grid['endpoints1'], potential, grid['points1'], grid['stiffness1'], mu, *params)
     output.export_potential_grid(grid['points1'], potential_grid, phase, *params)
@@ -164,7 +164,7 @@ def perform_detection(potential, n, emax, mu, intervals, grid, *params):
 
     # spectrum for second ECS phase
     phase = phases[1]
-    output.debug('Using ECS x0: {0}, phase: {1}'.format(x0, phase))
+    output.debug('Using ECS r0: {0}, phase: {1}'.format(r0, phase))
     output.debug('Creating Hamiltonian matrix')
     matrix, potential_grid = femdvr.hamiltonian(n, grid['endpoints2'], potential, grid['points2'], grid['stiffness2'], mu, *params)
     output.export_potential_grid(grid['points2'], potential_grid, phase, *params)
@@ -211,7 +211,7 @@ def create_grid(n, intervals):
 
     # first ECS phase
     endpoints = create_endpoints(intervals)
-    endpoints = femdvr.exterior_complex_scaling(endpoints, x0, phases[0])
+    endpoints = femdvr.exterior_complex_scaling(endpoints, r0, phases[0])
     points, weights = femdvr.fem_points_weights(n, endpoints)
     stiffness = femdvr.stiffness_matrix(n, endpoints)
     grid['endpoints1'] = endpoints
@@ -220,7 +220,7 @@ def create_grid(n, intervals):
 
     # second ECS phase
     endpoints = create_endpoints(intervals)
-    endpoints = femdvr.exterior_complex_scaling(endpoints, x0, phases[1])
+    endpoints = femdvr.exterior_complex_scaling(endpoints, r0, phases[1])
     points, weights = femdvr.fem_points_weights(n, endpoints)
     stiffness = femdvr.stiffness_matrix(n, endpoints)
     grid['endpoints2'] = endpoints

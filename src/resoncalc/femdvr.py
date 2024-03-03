@@ -85,12 +85,12 @@ def merge_endpoints(lists):
 
     return endpoints
 
-def exterior_complex_scaling(endpoints, x0, phase):
+def exterior_complex_scaling(endpoints, r0, phase):
     """Apply coordinate transformation using ECS method
 
     Args:
         endpoints (list): endpoints coordinates
-        x0 (float): point
+        r0 (float): point
         phase (int): angle in degrees
 
     Returns:
@@ -102,8 +102,8 @@ def exterior_complex_scaling(endpoints, x0, phase):
         point = endpoints[i]
 
         # apply ECS
-        if (point >= x0):
-            point = x0 + (point-x0) * np.exp(1j*phase*np.pi/180)
+        if (point >= r0):
+            point = r0 + (point-r0) * np.exp(1j*phase*np.pi/180)
         endpoints[i] = point
 
     return endpoints
