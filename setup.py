@@ -21,7 +21,7 @@ entry_points = {
 
 setup(
     name='resoncalc',
-    version='0.1.1',
+    version='0.1.2',
     description='Calculate bound states and resonances for potential',
     long_description=readme,
     long_description_content_type='text/markdown',
